@@ -1,0 +1,52 @@
+(ns bikecoord.actor-test
+  (:require [clojure.test :refer [deftest is testing]]
+            [bikecoord.actor :as actor]
+            [bikecoord.store :as store]))
+
+(defn- fresh-store []
+  (let [st (store/mem-store)]
+    (store/register-repairer! st {:repairer-id "repairer-1" :name "Ren Kobayashi"})
+    (store/register-shop! st {:shop-id "S-1" :name "Kobo Cycle Shop" :max-supply-cost 2000})
+    st))
+
+(deftest commits-a-registered-work-log
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:repairer-id "repairer-1" :op :log-work-record :stake :low
+                  :shop-id "S-1" :task "repair-job progress log"}
+        result (actor/run-request! graph request {} "thread-1")]
+    (is (= :done (:status result)))
+    (is (some? (get-in result [:state :record])))
+    (is (= 1 (count (store/records-of st "repairer-1"))))))
+
+(deftest holds-an-unregistered-shop-proposal
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:repairer-id "repairer-1" :op :log-work-record :stake :low
+                  :shop-id "S-ghost" :task "repair-job progress log"}
+        result (actor/run-request! graph request {} "thread-2")]
+    (is (= :hold (:disposition (:state result))))
+    (is (empty? (store/records-of st "repairer-1")))))
+
+(deftest interrupts-then-approves-safety-concern-on-human-approval
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:repairer-id "repairer-1" :op :flag-safety-concern :stake :low
+                  :shop-id "S-1" :hazard-type :brake-failure-risk}
+        interrupted (actor/run-request! graph request {} "thread-3")]
+    (is (= :interrupted (:status interrupted)))
+    (is (empty? (store/records-of st "repairer-1")))
+    (let [resumed (actor/approve! graph "thread-3")]
+      (is (= :done (:status resumed)))
+      (is (= 1 (count (store/records-of st "repairer-1")))))))
+
+(deftest holds-a-scope-excluded-op-even-at-high-confidence
+  (testing "an actor run can never commit a proposal that would finalize a repair-execution decision or a roadworthiness-clearance decision, regardless of disposition path"
+    (let [st (fresh-store)
+          graph (actor/build-graph {:store st})
+          request {:repairer-id "repairer-1" :op :declare-bicycle-roadworthy :stake :low
+                    :shop-id "S-1" :task "roadworthiness decision"}
+          result (actor/run-request! graph request {} "thread-4")]
+      (is (= :done (:status result)))
+      (is (= :hold (:disposition (:state result))))
+      (is (empty? (store/records-of st "repairer-1"))))))

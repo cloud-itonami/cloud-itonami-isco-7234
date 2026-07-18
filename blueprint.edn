@@ -1,0 +1,11 @@
+[{:itonami.blueprint/social-impact [:worker-safety :consumer-safety :sustainable-mobility]
+  :itonami.blueprint/domain :repair-services/bicycle-workshop-scheduling-logistics-coordination
+  :itonami.blueprint/required-technologies [:robotics :identity :audit-ledger]
+  :itonami.blueprint/isco-08 "7234"
+  :itonami.blueprint/name "Bicycle Repair Workshop Scheduling and Logistics Coordination Practice"
+  :itonami.blueprint/governor :bicycle-coord-governor
+  :itonami.blueprint/robotics true
+  :db/id -1
+  :itonami.blueprint/status :public-oss
+  :itonami.blueprint/id "cloud-itonami-isco-7234"
+  :itonami.blueprint/license "AGPL-3.0-or-later"}]
