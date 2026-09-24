@@ -1,5 +1,5 @@
 (ns bikecoord.actor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [bikecoord.actor :as actor]
             [bikecoord.store :as store]))
 
