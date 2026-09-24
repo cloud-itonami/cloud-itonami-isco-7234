@@ -1,5 +1,5 @@
 (ns bikecoord.governor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [bikecoord.store :as store]
             [bikecoord.advisor :as advisor]
             [bikecoord.governor :as governor]))
