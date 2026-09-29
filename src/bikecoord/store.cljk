@@ -1,7 +1,7 @@
 (ns bikecoord.store
   "SSoT for the ISCO-08 7234 bicycle and related repairers workshop
   scheduling/logistics coordination actor (itonami actor pattern,
-  ADR-2607121000 / CLAUDE.md Actors section; README's 'Robotics
+  ADR-2607121000 / AGENTS.md Actors section; README's 'Robotics
   premise' — a bicycle-repair-workshop scheduling/logistics
   coordination robot performs crew scheduling, repair-job/inventory/
   progress record logging and bicycle-parts supply-order coordination
